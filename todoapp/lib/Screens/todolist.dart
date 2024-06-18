@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:todoapp/Utils/DIalogBox.dart';
 import 'package:todoapp/Utils/todoTile.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 class todoList extends StatefulWidget {
   const todoList({super.key});
@@ -46,6 +47,12 @@ class _todoListState extends State<todoList> {
     Navigator.of(context).pop();
   }
 
+  void onDelete(index) {
+    setState(() {
+      todoList.removeAt(index);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,19 +74,29 @@ class _todoListState extends State<todoList> {
           size: 30,
         ),
       ),
-      body: Center(
-          child: ListView.builder(
-        itemCount: todoList.length,
-        itemBuilder: (context, index) {
-          return todoTile(
-            text: todoList[index][0],
-            taskCompleted: todoList[index][1],
-            onchanged: (value) {
-              return onChanged(todoList[index][1], index);
-            },
-          );
-        },
-      )),
+      body: Slidable(
+        endActionPane: ActionPane(motion: ScrollMotion(), children: [
+          SlidableAction(
+            onPressed: onDelete,
+            backgroundColor: Colors.red,
+            icon: Icons.delete,
+            label: 'Delete',
+          )
+        ]),
+        child: Center(
+            child: ListView.builder(
+          itemCount: todoList.length,
+          itemBuilder: (context, index) {
+            return todoTile(
+              text: todoList[index][0],
+              taskCompleted: todoList[index][1],
+              onchanged: (value) {
+                return onChanged(todoList[index][1], index);
+              },
+            );
+          },
+        )),
+      ),
     );
   }
 }
