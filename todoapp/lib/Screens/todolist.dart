@@ -1,8 +1,11 @@
 // ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors, camel_case_types, body_might_complete_normally_nullable
 
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:todoapp/Utils/DIalogBox.dart';
 import 'package:todoapp/Utils/todoTile.dart';
+import 'package:todoapp/database/database.dart';
+import 'package:hive/hive.dart';
 
 class todoList extends StatefulWidget {
   const todoList({super.key});
@@ -11,16 +14,15 @@ class todoList extends StatefulWidget {
   State<todoList> createState() => _todoListState();
 }
 
-class _todoListState extends State<todoList> {
-  List todoList = [
-    ['Finish ToDo App', false],
-    ['Do exercise', false]
-  ];
+final _myBox = Hive.box('myBox');
+todoDataBase db = new todoDataBase();
 
+class _todoListState extends State<todoList> {
   void Function(bool?)? onChanged(bool value, int index) {
     setState(() {
-      todoList[index][1] = !todoList[index][1];
+      db.todoList[index][1] = !db.todoList[index][1];
     });
+    db.updateData();
   }
 
   TextEditingController controller = new TextEditingController();
@@ -40,16 +42,28 @@ class _todoListState extends State<todoList> {
     setState(() {
       controller.text.isEmpty
           ? print('Text Field cannot be empty')
-          : todoList.add([controller.text, false]);
+          : db.todoList.add([controller.text, false]);
       controller.clear();
     });
     Navigator.of(context).pop();
+    db.updateData();
   }
 
   void onDelete(int index) {
     setState(() {
-      todoList.removeAt(index);
+      db.todoList.removeAt(index);
     });
+    db.updateData();
+  }
+
+  @override
+  void initState() {
+    if (_myBox.get('TODOLIST') == null) {
+      db.createInitialData();
+    } else {
+      db.loadData();
+    }
+    super.initState();
   }
 
   @override
@@ -75,13 +89,13 @@ class _todoListState extends State<todoList> {
       ),
       body: Center(
           child: ListView.builder(
-        itemCount: todoList.length,
+        itemCount: db.todoList.length,
         itemBuilder: (context, index) {
           return todoTile(
-            text: todoList[index][0],
-            taskCompleted: todoList[index][1],
+            text: db.todoList[index][0],
+            taskCompleted: db.todoList[index][1],
             onchanged: (value) {
-              return onChanged(todoList[index][1], index);
+              return onChanged(db.todoList[index][1], index);
             },
             ondelete: (context) => onDelete(index),
           );
