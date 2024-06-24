@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 
 void main() async {
+    WidgetsFlutterBinding.ensureInitialized();
   try {
     final directory = await getApplicationDocumentsDirectory();
     Hive.init(directory.path);
@@ -17,7 +18,7 @@ void main() async {
     print('Error initializing Hive: $e');
     // Handle the error appropriately
   }
-  // WidgetsFlutterBinding.ensureInitialized();
+
 
   // final directory = await getApplicationDocumentsDirectory();
   // Hive.init(directory.path);

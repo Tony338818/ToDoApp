@@ -27,6 +27,7 @@ class todoTile extends StatelessWidget {
             onPressed: ondelete,
             backgroundColor: Colors.red,
             icon: Icons.delete,
+            borderRadius: BorderRadius.circular(10),
           )
         ]),
         child: Container(
